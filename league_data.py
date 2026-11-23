@@ -4,7 +4,7 @@ import requests
 from dotenv import load_dotenv
 import os
 from rich import print_json
-from requests_cache import CachedSession, SQLiteCache
+from requests_cache import CachedSession, SQLiteCache, DO_NOT_CACHE
 import logging
 from rich.logging import RichHandler
 from datetime import datetime
@@ -13,10 +13,18 @@ import uuid
 BASE_URL = "https://api.sleeper.app/v1"
 TIMEOUT = 10
 
-logger = logging.getLogger(__name__)
+URLS_EXPIRE_AFTER = {
+    f"{BASE_URL}/players/nfl": 86400,
+}
 
+logger = logging.getLogger(__name__)
 backend = SQLiteCache("cache/http_cache.sqlite", timeout=30)
-session = CachedSession("http_cache", backend=backend)
+session = CachedSession(
+    "http_cache",
+    backend=backend,
+    urls_expire_after=URLS_EXPIRE_AFTER,
+    expire_after=DO_NOT_CACHE,
+)
 
 
 class SleeperNotFoundError(Exception):
@@ -26,6 +34,7 @@ class SleeperNotFoundError(Exception):
 def _get(path: str):
     """GET a Sleeper endpoint and return parsed JSON"""
     response = session.get(f"{BASE_URL}{path}", timeout=TIMEOUT)
+    logger.debug("path=%s, from_cache=%s", path, response.from_cache)
     response.raise_for_status()
     data = response.json()
     if data is None:
@@ -140,7 +149,8 @@ def main():
         # print_json(data=state)
 
         player = get_all_players("QB", True)
-        # print_json(player)
+        print_json(data=player)
+
         run_status = "success"
     except Exception:
         logger.exception("Main failed to run")
