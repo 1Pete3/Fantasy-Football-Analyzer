@@ -226,10 +226,11 @@ __marimo__/
 .streamlit/secrets.toml
 
 # SQLite
-.sqlite
+*.sqlite
+*.sqlite-journal
 
 # Logs
 /logs
 
 # Cache
-/cache
+cache/
