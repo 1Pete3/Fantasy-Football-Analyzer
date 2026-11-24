@@ -230,3 +230,6 @@ __marimo__/
 
 # Logs
 /logs
+
+# Cache
+/cache
