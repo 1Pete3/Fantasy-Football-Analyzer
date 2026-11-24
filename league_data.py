@@ -1,14 +1,12 @@
-from socket import timeout
-from time import perf_counter
-import requests
-from dotenv import load_dotenv
-import os
-from rich import print_json
-from requests_cache import CachedSession, SQLiteCache, DO_NOT_CACHE
 import logging
-from rich.logging import RichHandler
-from datetime import datetime
+import os
 import uuid
+from datetime import datetime
+from time import perf_counter
+
+from dotenv import load_dotenv
+from requests_cache import DO_NOT_CACHE, CachedSession, SQLiteCache
+from rich import print_json
 
 BASE_URL = "https://api.sleeper.app/v1"
 TIMEOUT = 10
@@ -100,7 +98,7 @@ def get_all_picks_in_draft(draft_id: str) -> list[dict]:
 
 # --- Player API Information ---
 def get_all_players(position: str | None = None, active: bool | None = None):
-    return _get(f"/players/nfl")
+    return _get("/players/nfl")
 
 
 # --- main ---
@@ -129,24 +127,6 @@ def main():
 
         if not league_id:
             raise SystemExit("SLEEPER_LEAGUE_ID is not set in .env")
-
-        league = get_league(league_id)
-        # print_json(data=league["roster_positions"])
-
-        rosters = get_rosters(league_id)
-        # print_json(data=rosters)
-
-        users = get_users_in_league(league_id)
-        # print_json(data=users)
-
-        matchups = get_matchups(league_id, week=1)
-        # print_json(data=matchups)
-
-        transactions = get_transactions(league_id, 1)
-        # print_json(data=transactions)
-
-        state = get_nfl_state()
-        # print_json(data=state)
 
         player = get_all_players("QB", True)
         print_json(data=player)
