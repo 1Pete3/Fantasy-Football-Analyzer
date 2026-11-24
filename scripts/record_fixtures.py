@@ -1,13 +1,16 @@
-from fantasy_football_analyzer.sleeper import get_all_players
+import logging
 import os
 import uuid
 from datetime import datetime
 from time import perf_counter
-import logging
+
 from dotenv import load_dotenv
 from rich import print_json
 
+from fantasy_football_analyzer.sleeper import get_all_players
+
 logger = logging.getLogger(__name__)
+
 
 # --- main ---
 def main():

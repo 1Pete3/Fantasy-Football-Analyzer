@@ -1,7 +1,6 @@
 import logging
 
 from requests_cache import DO_NOT_CACHE, CachedSession, SQLiteCache
-from rich import print_json
 
 BASE_URL = "https://api.sleeper.app/v1"
 TIMEOUT = 10
