@@ -2,6 +2,7 @@ import logging
 import os
 import uuid
 from datetime import datetime
+from pathlib import Path
 from time import perf_counter
 
 from dotenv import load_dotenv
@@ -14,14 +15,14 @@ logger = logging.getLogger(__name__)
 
 # --- main ---
 def main():
+    log_dir = Path(__file__).resolve().parents[1] / "logs"
     run_id = uuid.uuid4()
     today = datetime.now().strftime("%Y-%m-%d")
     start = perf_counter()
-    log_path = f"logs/{today}_league_data.log"
+    log_path = log_dir / f"{today}_league_data.log"
     run_status = "error"
 
-    if not os.path.exists("logs"):
-        os.mkdir("logs")
+    log_dir.mkdir(exist_ok=True)
 
     logging.basicConfig(
         filename=log_path,
@@ -55,6 +56,7 @@ def main():
             str(round(runtime, 2)),
             run_status,
         )
+        print(log_path)
 
 
 if __name__ == "__main__":

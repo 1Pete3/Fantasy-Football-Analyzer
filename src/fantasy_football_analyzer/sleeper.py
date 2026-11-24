@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 from requests_cache import DO_NOT_CACHE, CachedSession, SQLiteCache
 
@@ -10,7 +11,13 @@ URLS_EXPIRE_AFTER = {
 }
 
 logger = logging.getLogger(__name__)
-backend = SQLiteCache("cache/http_cache.sqlite", timeout=30)
+
+# src/fantasy_football_analyzer/sleeper.py -> project root
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+CACHE_DIR = PROJECT_ROOT / "cache"
+CACHE_DIR.mkdir(exist_ok=True)
+
+backend = SQLiteCache(CACHE_DIR / "http_cache.sqlite", timeout=30)
 session = CachedSession(
     "http_cache",
     backend=backend,
