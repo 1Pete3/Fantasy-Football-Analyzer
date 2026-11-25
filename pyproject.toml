@@ -10,6 +10,7 @@ dependencies = [
     "requests-cache",
     "rich",
     "python-dotenv",
+    "pydantic",
 ]
 
 [dependency-groups]
