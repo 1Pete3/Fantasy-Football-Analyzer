@@ -1,7 +1,5 @@
-from typing import Any
-
-
 import os
+from typing import Any
 
 from dotenv import load_dotenv
 from rich import print
@@ -92,4 +90,3 @@ def get_member_info() -> dict[Any, Any]:
             team_name=username,
         )
     return member
-
