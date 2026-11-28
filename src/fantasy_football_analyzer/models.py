@@ -8,6 +8,12 @@ class User(BaseModel):
     team_name: str
 
 
+class Player(BaseModel):
+    first_name: str
+    last_name: str
+    position: str
+
+
 class Roster(BaseModel):
     user_id: str | None
     co_owners: list[str] | None = None
@@ -21,9 +27,9 @@ class Roster(BaseModel):
     losses: int
     ties: int
     roster_id: int
-    players: list[str]
-    reserve: list[str] | None = None
-    starters: list[str]
+    players: list[dict[str, Player]]
+    reserve: list[dict[str, Player]] | None = None
+    starters: list[dict[str, Player]] | None = None
 
 
 class Member(BaseModel):
