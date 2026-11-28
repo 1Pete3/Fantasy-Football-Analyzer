@@ -1,8 +1,5 @@
 import logging
-import os
 from typing import Any
-
-from dotenv import load_dotenv
 
 from fantasy_football_analyzer.models import Roster, User
 from fantasy_football_analyzer.sleeper import (
@@ -11,12 +8,7 @@ from fantasy_football_analyzer.sleeper import (
     get_users_in_league,
 )
 
-load_dotenv()
 logger = logging.getLogger(__name__)
-
-users: list[dict[Any, Any]] = get_users_in_league(os.getenv("SLEEPER_LEAGUE_ID"))
-rosters: list[dict[Any, Any]] = get_rosters(os.getenv("SLEEPER_LEAGUE_ID"))
-all_players = get_all_players()
 
 
 def format_player(player_id, first_name, last_name, postion) -> dict[Any, Any]:
@@ -29,7 +21,7 @@ def format_player(player_id, first_name, last_name, postion) -> dict[Any, Any]:
     return player
 
 
-def get_player_info(player_list) -> list[Any]:
+def get_player_info(player_list, all_players) -> list[Any]:
     formatted_player_list = []
     for player in player_list or []:
         if player != "0":
@@ -52,7 +44,11 @@ def format_fantasy_points(int_points, decimal_points) -> Any:
     return points
 
 
-def get_member_info() -> dict[Any, Any]:
+def get_member_info(league_id:str) -> dict[Any, Any]:
+    all_players = get_all_players()
+    users: list[dict[Any, Any]] = get_users_in_league(league_id)
+    rosters: list[dict[Any, Any]] = get_rosters(league_id)
+
     users_by_id = {}
     for user in users:
         users_by_id[user["user_id"]] = User(
@@ -85,8 +81,8 @@ def get_member_info() -> dict[Any, Any]:
             losses=(roster.get("settings") or {}).get("losses", 0),
             ties=(roster.get("settings") or {}).get("ties", 0),
             roster_id=roster.get("roster_id"),
-            players=get_player_info(roster.get("players", None)),
-            starters=get_player_info(roster.get("starters", None)),
+            players=get_player_info(roster.get("players"), all_players),
+            starters=get_player_info(roster.get("starters"), all_players),
             record=(roster.get("metadata") or {}).get("record", None),
             streak=(roster.get("metadata") or {}).get("streak", None),
         )
