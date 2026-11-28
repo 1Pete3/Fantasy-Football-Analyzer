@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import Any
 
@@ -11,6 +12,7 @@ from fantasy_football_analyzer.sleeper import (
 )
 
 load_dotenv()
+logger = logging.getLogger(__name__)
 
 users: list[dict[Any, Any]] = get_users_in_league(os.getenv("SLEEPER_LEAGUE_ID"))
 rosters: list[dict[Any, Any]] = get_rosters(os.getenv("SLEEPER_LEAGUE_ID"))
@@ -29,15 +31,17 @@ def format_player(player_id, first_name, last_name, postion) -> dict[Any, Any]:
 
 def get_player_info(player_list) -> list[Any]:
     formatted_player_list = []
-    for player in player_list:
+    for player in player_list or []:
         if player != "0":
-            player_info = all_players.get(player)
+            player_info = all_players.get(player) or {}
+            if not player_info:
+                logger.warning("Unknown player id %s", player)
             formatted_player_list.append(
                 format_player(
                     player,
-                    player_info.get("first_name", None),
-                    player_info.get("last_name", ""),
-                    player_info.get("position", ""),
+                    player_info.get("first_name") or "",
+                    player_info.get("last_name") or "",
+                    player_info.get("position") or "",
                 )
             )
     return formatted_player_list
