@@ -2,7 +2,6 @@ import os
 from typing import Any
 
 from dotenv import load_dotenv
-from rich import print
 
 from fantasy_football_analyzer.models import Roster, User
 from fantasy_football_analyzer.sleeper import (
@@ -50,43 +49,42 @@ def format_fantasy_points(int_points, decimal_points) -> Any:
 
 
 def get_member_info() -> dict[Any, Any]:
+    users_by_id = {}
+    for user in users:
+        users_by_id[user["user_id"]] = User(
+            user_id=user["user_id"],
+            display_name=user["display_name"],
+            league_id=user["league_id"],
+            team_name=(user.get("metadata") or {}).get("team_name")
+            or user["display_name"],
+        )
+
     member = {}
     for roster in rosters:
-        print(roster)
-        member[roster["owner_id"]] = {"user": {}, "roster": {}}
-        member[roster["owner_id"]]["roster"] = Roster(
+        member[roster["roster_id"]] = {
+            "user": users_by_id.get(roster["owner_id"]),
+            "roster": {},
+        }
+        member[roster["roster_id"]]["roster"] = Roster(
             user_id=roster["owner_id"],
             co_owners=roster.get("co_owners", None),
             league_id=roster.get("league_id"),
             points_for=format_fantasy_points(
-                roster.get("settings", None).get("fpts", 0),
-                roster.get("settings", None).get("fpts_decimal", 0),
+                (roster.get("settings") or {}).get("fpts", 0),
+                (roster.get("settings") or {}).get("fpts_decimal", 0),
             ),
             points_against=format_fantasy_points(
-                roster.get("settings", None).get("fpts_against", 0),
-                roster.get("settings", None).get("fpts_against_decimal", 0),
+                (roster.get("settings") or {}).get("fpts_against", 0),
+                (roster.get("settings") or {}).get("fpts_against_decimal", 0),
             ),
-            wins=roster.get("settings", None).get("wins", 0),
-            losses=roster.get("settings", None).get("losses", 0),
-            ties=roster.get("settings").get("ties", 0),
+            wins=(roster.get("settings") or {}).get("wins", 0),
+            losses=(roster.get("settings") or {}).get("losses", 0),
+            ties=(roster.get("settings") or {}).get("ties", 0),
             roster_id=roster.get("roster_id"),
             players=get_player_info(roster.get("players", None)),
             starters=get_player_info(roster.get("starters", None)),
-            record=roster.get("metadata", None).get("record", None),
-            streak=roster.get("metadata", None).get("streak", None),
+            record=(roster.get("metadata") or {}).get("record", None),
+            streak=(roster.get("metadata") or {}).get("streak", None),
         )
 
-    for user in users:
-        username = ""
-        if user.get("metadata", "display_name").get("team_name") == None:
-            username = user.get("display_name")
-        else:
-            username = user.get("metadata", "display_name").get("team_name")
-
-        member[user["user_id"]]["user"] = User(
-            user_id=user["user_id"],
-            display_name=user["display_name"],
-            league_id=user["league_id"],
-            team_name=username,
-        )
     return member
