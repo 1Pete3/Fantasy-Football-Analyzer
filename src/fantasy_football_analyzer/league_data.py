@@ -44,7 +44,7 @@ def format_fantasy_points(int_points, decimal_points) -> Any:
     return points
 
 
-def get_member_info(league_id:str) -> dict[Any, Any]:
+def get_member_info(league_id: str) -> dict[Any, Any]:
     all_players = get_all_players()
     users: list[dict[Any, Any]] = get_users_in_league(league_id)
     rosters: list[dict[Any, Any]] = get_rosters(league_id)
